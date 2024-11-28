@@ -1,0 +1,70 @@
+name: classification
+
+data:
+  data_root: data/OxfordIIITPet
+  dataset: oxfordIIITPets
+  batch_size: 8
+  num_workers: 24
+
+# model for data
+model:
+  _target_: models.resnet.ResNet18
+  #_target_: models.alexnet.AlexNet  
+  #_target_: models.vgg.vgg16_bn
+  #_target_: models.convnext.convnext_tiny  
+  input_channel: 3
+  num_classes: 37
+
+# optimizer for training task model
+optimizer:
+  _target_: torch.optim.SGD
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0005
+
+# lr scheduler for training task optimizer
+lr_scheduler:
+  _target_: torch.optim.lr_scheduler.MultiStepLR
+  milestones: [30, 60, 90, 100]
+  gamma: 0.2
+
+epoch: 200             # 100
+save_num_model: 200    # 200
+
+# ResNet18
+train_layer: ['layer4.1.bn1.weight', 'layer4.1.bn1.bias', 'layer4.1.bn2.bias', 'layer4.1.bn2.weight']
+
+#train_layer: ['layer4.1.batch_norm1.weight','layer4.1.batch_norm1.bias',
+#              'layer4.1.batch_norm2.weight','layer4.1.batch_norm2.bias', 
+#              'layer4.1.batch_norm3.weight','layer4.1.batch_norm3.bias']
+
+# ResNet34
+#train_layer: ['layer4.2.batch_norm1.weight','layer4.2.batch_norm1.bias',
+#              'layer4.2.batch_norm2.weight','layer4.2.batch_norm2.bias', 
+#              'layer4.2.batch_norm3.weight','layer4.2.batch_norm3.bias']
+
+# ResNet50
+#train_layer: ['layer4.2.batch_norm1.weight','layer4.2.batch_norm1.bias',
+#              'layer4.2.batch_norm2.weight','layer4.2.batch_norm2.bias', 
+#              'layer4.2.batch_norm3.weight','layer4.2.batch_norm3.bias']
+
+# VGG11_bn
+#train_layer: ['features.26.weight','features.26.bias']
+
+# VGG16_bn
+#train_layer: ['features.41.weight','features.41.bias']
+
+# AlexNet
+#train_layer: ['features.10.weight','features.10.bias']
+
+# ConvNext
+#train_layer: []
+
+# parameter data root
+param:
+  data_root: param_data/oxfordIIITPets/data.pt
+  k: 200
+  num_workers: 24
+  
+
+
