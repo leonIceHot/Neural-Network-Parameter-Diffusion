@@ -8,7 +8,6 @@ import omegaconf
 import json
 
 from sklearn.metrics import roc_auc_score
-
 from .base_task import BaseTask
 from torch.utils.tensorboard import SummaryWriter
 from core.utils import *
@@ -16,14 +15,14 @@ from core.data.vision_dataset import VisionData
 from core.data.parameters import PData
 from core.utils.utils import *
 
-
+# For Chestmnist
 class CFTask(BaseTask):
     def __init__(self, config, **kwargs):
         super(CFTask, self).__init__(config, **kwargs)
         self.train_loader = self.task_data.train_dataloader()
         self.eval_loader = self.task_data.val_dataloader()
         self.test_loader = self.task_data.test_dataloader()
-        self.dataset = "medmnist"
+        self.dataset = "chestmnist"
         self.writer = SummaryWriter('runs/' + self.dataset)
 
     def init_task_data(self):
@@ -39,88 +38,122 @@ class CFTask(BaseTask):
     def test_g_model(self, input):
         net = self.model
         train_layer = self.train_layer
-        param = input
-        target_num = 0
-        for name, module in net.named_parameters():
-            if name in train_layer:
-                target_num += torch.numel(module)
-        params_num = torch.squeeze(param).shape[0]  # + 30720
-        #assert (target_num == params_num)
-        param = torch.squeeze(param)
-        model = partial_reverse_tomodel(param, net, train_layer).to(param.device)
+        param = torch.squeeze(input)
 
+        target_num = sum(torch.numel(module) for name, module in net.named_parameters() if name in train_layer)
+        params_num = param.shape[0]
+
+        # 參數一致性檢查
+        # assert (target_num == params_num), f"Parameter count mismatch: {target_num} != {params_num}"
+
+        # 還原模型
+        model = partial_reverse_tomodel(param, net, train_layer).to(param.device)
         model.eval()
-        test_loss = 0
+
+        test_loss = 0.0
         correct = 0
         total = 0
-
         output_list = []
 
         with torch.no_grad():
-            for data, target in self.test_loader:
+            for num, (data, target) in enumerate(self.test_loader, start=1):
+                #print(f"Num: {num}")
                 data, target = data.cuda(), target.cuda()
-                output = model(data)
-                #target = target.to(torch.int64).squeeze()
+
+                # 確保 target 是浮點型
                 target = target.float()
-                #test_loss += F.cross_entropy(output, target, size_average=False).item()  # sum up batch loss
-                test_loss = nn.BCEWithLogitsLoss()(output, target)
 
-                #total += data.shape[0]
-                #pred = torch.max(output, 1)[1]
+                # 模型前向傳播
+                output = model(data)
 
-                predicted = (output.sigmoid() > 0.5).float().cuda()
-                output_list += predicted.cpu().numpy().tolist()
-                #print(f"Pred:{pred}")
-                #print(f"Target:{target}")
-                #correct += pred.eq(target.view_as(pred)).sum().item()
-                correct += predicted.eq(target).sum().item()
+                # Binary Cross-Entropy Loss
+                loss_fn = nn.BCEWithLogitsLoss()
+                test_loss += loss_fn(output, target).item() * data.size(0)
 
+                # 將輸出轉換為二元分類標籤 (0 或 1)
+                predicted = (output.sigmoid() > 0.5).float()
+
+                # 計算正確數量
+                batch_correct = (predicted.long() == target.long()).sum().item()
+                #print(f"Batch correct: {batch_correct}")
+                correct += batch_correct
+
+                # 確認 total 是元素總數
+                total += target.numel()
+
+                # 儲存預測結果
+                output_list.extend(predicted.cpu().numpy().tolist())
+
+        # 計算平均損失
         test_loss /= total
-        acc = 100. * correct / total
+
+        # 計算準確度
+        acc = 100. * correct / total if total > 0 else 0.0
+
+        print(f"Correct: {correct}, Total: {total}, Accuracy: {acc:.2f}%")
+
         del model
         return acc, test_loss, output_list
 
     def val_g_model(self, input):
         net = self.model
         train_layer = self.train_layer
-        param = input
-        target_num = 0
-        for name, module in net.named_parameters():
-            if name in train_layer:
-                target_num += torch.numel(module)
-        params_num = torch.squeeze(param).shape[0]  # + 30720
-        assert (target_num == params_num)
-        param = torch.squeeze(param)
-        model = partial_reverse_tomodel(param, net, train_layer).to(param.device)
+        param = torch.squeeze(input)
 
+        # 計算需要更新的參數數量
+        target_num = sum(torch.numel(module) for name, module in net.named_parameters() if name in train_layer)
+        params_num = param.shape[0]
+
+        # 驗證參數數量是否一致
+        assert target_num == params_num, f"Parameter count mismatch: {target_num} != {params_num}"
+
+        # 還原模型參數
+        model = partial_reverse_tomodel(param, net, train_layer).to(param.device)
         model.eval()
-        test_loss = 0
+
+        test_loss = 0.0
         correct = 0
         total = 0
-
         output_list = []
 
         with torch.no_grad():
-            for data, target in self.train_loader:
+            for num, (data, target) in enumerate(self.train_loader, start=1):
+                #print(f"Num: {num}")
                 data, target = data.cuda(), target.cuda()
-                output = model(data)
-                #target = target.to(torch.int64)
+
+                # 確保 target 和 output 的數據類型一致
                 target = target.float()
-                #test_loss += F.cross_entropy(output, target, size_average=False).item()  # sum up batch loss
-                test_loss = nn.BCEWithLogitsLoss()(output, target)
 
-                total += data.shape[0]
-                #pred = torch.max(output, 1)[1]
-                #output_list += pred.cpu().numpy().tolist()
+                # 模型前向傳播
+                output = model(data)
 
-                predicted = (output.sigmoid() > 0.5).float().cuda()
-                output_list += predicted.cpu().numpy().tolist()
-                #correct += pred.eq(target.view_as(pred)).sum().item()
-                correct += predicted.eq(target).sum().item()
+                # 計算 Binary Cross-Entropy Loss
+                loss_fn = nn.BCEWithLogitsLoss()
+                test_loss += loss_fn(output, target).item() * data.size(0)
 
+                # 將輸出轉換為二元分類標籤 (0 或 1)
+                predicted = (output.sigmoid() > 0.5).float()
+
+                # 儲存預測結果
+                output_list.extend(predicted.cpu().numpy().tolist())
+
+                # 計算正確預測數量
+                correct += (predicted == target).sum().item()
+
+                # 計算總元素數量，而不是 batch 大小
+                total += target.numel()
+
+        # 計算平均損失
         test_loss /= total
-        acc = 100. * correct / total
-        del model
+
+        # 計算準確率
+        acc = 100. * correct / total if total > 0 else 0.0
+
+        #print(f"Total: {total}")
+        #print(f"Correct: {correct}")
+        #print(f"Accuracy: {acc:.2f}%")
+        print(f"Correct: {correct}, Total: {total}, Accuracy: {acc:.2f}%")
+
         return acc, test_loss, output_list
 
     # override the abstract method in base_task.py, you obtain the model data for generation
@@ -297,8 +330,6 @@ class CFTask(BaseTask):
             self.writer.add_scalar('Train/Accuracy', epoch_acc, epoch)
             #self.writer.add_scalar('Train/AUC', auc, epoch)
             self.writer.flush()
-
-
 
     def test(self, net, criterion, testloader, epoch):
         global best_acc

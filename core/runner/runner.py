@@ -6,7 +6,7 @@ import pytorch_lightning as pl
 import sys
 import os
 import datetime
-from core.tasks.classification import CFTask
+from core.tasks.classification1 import CFTask
 from core.system import *
 import torch
 import torch.distributed as dist

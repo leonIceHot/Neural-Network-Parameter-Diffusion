@@ -4,7 +4,7 @@ from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 from captum.attr import LayerGradCam, LayerAttribution, IntegratedGradients, GuidedGradCam, Saliency
 from torchvision import datasets, transforms, models
-from visualization_tsne import target
+from visualization_tsne_all import target
 from torch.autograd import Function
 from torch.nn import functional as F
 from models import resnet

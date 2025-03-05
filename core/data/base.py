@@ -29,10 +29,17 @@ class DataBase(pl.LightningDataModule):
         raise NotImplementedError
 
 
+
     def train_dataloader(self) -> TRAIN_DATALOADERS:
         return DataLoader(self.train_dataset, batch_size=self.batch_size,
                           num_workers=self.num_workers, shuffle=True, 
                           drop_last=True, pin_memory=True, persistent_workers=True)
+
+    '''
+    def train_dataloader(self) -> TRAIN_DATALOADERS:
+        return DataLoader(self.train_dataset, batch_size=self.batch_size,
+                          num_workers=self.num_workers, shuffle=True, persistent_workers=True)
+    '''
 
     def val_dataloader(self) -> EVAL_DATALOADERS:
         return DataLoader(self.val_dataset, batch_size=self.batch_size, 

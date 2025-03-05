@@ -21,7 +21,8 @@ class PData(DataBase):
 
         # check the root is a directory or file
         if os.path.isfile(self.root):
-            state = torch.load(self.root, map_location='cpu')
+            #state = torch.load(self.root, map_location='cpu')
+            state = torch.load(self.root)
             self.fix_model = state['model']
             self.fix_model.eval()
             self.fix_model.to('cpu')

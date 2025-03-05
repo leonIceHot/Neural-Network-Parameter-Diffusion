@@ -29,7 +29,7 @@ class VisionData(DataBase):
         super(VisionData, self).__init__(cfg, **kwargs)
         self.root = getattr(self.cfg, 'data_root', './data')
         self.dataset = getattr(self.cfg, 'dataset', 'mnist')
-        self.dataset2 = 'rfmid'
+        #self.dataset2 = 'rfmid'
 
         # MedMNIST
         self.data_flag  = 'chestmnist'
@@ -325,27 +325,6 @@ class VisionData(DataBase):
         return values
     '''
 
-
-    # RetinaMNIST
-    '''
-    @property
-    def train_dataset(self):
-        values = self.DataClass(root='./data/MedMNIST2D/RetinaMNIST', split='train', transform=self.train_transform,
-                                download=True, size=28)
-        return values
-
-    @property
-    def val_dataset(self):
-        values = self.DataClass(root='./data/MedMNIST2D/RetinaMNIST', split='val', transform=self.val_transform,
-                                download=True, size=28)
-        return values
-
-    @property
-    def test_dataset(self):
-        values = datasets.ImageFolder(root='./data/Data/Retinal_Fundus/A. RFMiD_All_Classes_Dataset/1.Original Images/c.Testing Set',transform=self.val_transform2)
-        return values
-    '''
-
     # Cinic10    
     '''
     @property
@@ -384,9 +363,30 @@ class VisionData(DataBase):
     def test_dataset(self):
         values = datasets.ImageFolder(root='./data/ImageNet-Sketch/sketch',transform=self.val_transform)                
         return values
-    '''    
-            
-    # PathMNIST    
+    '''
+
+    # RetinaMNIST
+    '''
+    @property
+    def train_dataset(self):
+        values = self.DataClass(root='./data/MedMNIST2D/RetinaMNIST', split='train', transform=self.train_transform,
+                                download=True, size=28)
+        return values
+
+    @property
+    def val_dataset(self):
+        values = self.DataClass(root='./data/MedMNIST2D/RetinaMNIST', split='val', transform=self.val_transform,
+                                download=True, size=28)
+        return values
+
+    @property
+    def test_dataset(self):
+        values = self.DataClass(root='./data/MedMNIST2D/RetinaMNIST', split='val', transform=self.val_transform,
+                                download=True, size=28)
+        return values
+    '''
+
+    # PathMNIST
     '''
     @property
     def train_dataset(self):        
@@ -398,12 +398,11 @@ class VisionData(DataBase):
         values = self.DataClass(root='./data/MedMNIST2D/PathMNIST',split='val',transform=self.val_transform, download=True, size=28)                
         return values
 
-
     @property
     def test_dataset(self):
         values = self.DataClass(root='./data/MedMNIST2D/PathMNIST',split='test',transform=self.val_transform, download=True, size=28)                
         return values    
-    '''            
+    '''
 
     # BreastMNIST
     '''
@@ -421,28 +420,28 @@ class VisionData(DataBase):
     @property
     def test_dataset(self):
         values = self.DataClass(root='./data/MedMNIST2D/BreastMNIST',split='test',transform=self.val_transform, download=True, size=28)                
-        return values       
+        return values
     '''
 
-    
     # PathMNIST
     '''
+    @property
     def train_dataset(self):        
-        values = self.DataClass(root='./data/MedMNIST2D/PathMNIST',split='train',transform=self.train_transform, download=True )
+        values = self.DataClass(root='./data/MedMNIST2D/PathMNIST',split='train',transform=self.train_transform, download=True,size=28)
         return values    
     
     @property
     def val_dataset(self):
-        values = self.DataClass(root='./data/MedMNIST2D/PathMNIST',split='val',transform=self.val_transform, download=True)
+        values = self.DataClass(root='./data/MedMNIST2D/PathMNIST',split='val',transform=self.val_transform, download=True,size=28)
         return values
         
     @property
     def test_dataset(self):
-        values = self.DataClass(root='./data/MedMNIST2D/PathMNIST',split='test',transform=self.val_transform, download=True)
+        values = self.DataClass(root='./data/MedMNIST2D/PathMNIST',split='test',transform=self.val_transform, download=True,size=28)
         return values       
     '''
 
-    # OCTMNIST    
+    # OCTMNIST
     '''
     @property
     def train_dataset(self):        
@@ -459,7 +458,7 @@ class VisionData(DataBase):
     def test_dataset(self):
         values = self.DataClass(root='./data/MedMNIST2D/OCTMNIST',split='test',transform=self.val_transform, download=True, size=28)                
         return values    
-    '''    
+    '''
     
     
     # RetinaMNIST    
@@ -499,7 +498,7 @@ class VisionData(DataBase):
         return values            
     '''
     
-    # PneumoniaMNIST    
+    # PneumoniaMNIST
     '''
     @property
     def train_dataset(self):        
@@ -515,7 +514,7 @@ class VisionData(DataBase):
     def test_dataset(self):
         values = self.DataClass(root='./data/MedMNIST2D/PneumoniaMNIST',split='test',transform=self.val_transform, download=True, size=28)                
         return values            
-    '''    
+    '''
     
     
     # ChestMNIST
@@ -536,7 +535,7 @@ class VisionData(DataBase):
 
 
     # DermaMNIST
-    '''    
+    '''
     @property
     def train_dataset(self):        
         values = self.DataClass(root='./data/MedMNIST2D/DermaMNIST',split='train',transform=self.train_transform, download=True, size=28)                
@@ -605,7 +604,7 @@ class VisionData(DataBase):
     def test_dataset(self):
         values = self.DataClass(root='./data/MedMNIST2D/OrganCMNIST',split='test',transform=self.val_transform, download=True, size=28)                
         return values    
-    '''    
+    '''
     
     # OrganSMNIST
     '''
@@ -623,4 +622,4 @@ class VisionData(DataBase):
     def test_dataset(self):
         values = self.DataClass(root='./data/MedMNIST2D/OrganSMNIST',split='test',transform=self.val_transform, download=True, size=28)                
         return values            
-    '''    
+    '''
