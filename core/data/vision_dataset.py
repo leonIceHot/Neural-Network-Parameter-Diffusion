@@ -32,7 +32,7 @@ class VisionData(DataBase):
         #self.dataset2 = 'rfmid'
 
         # MedMNIST
-        self.data_flag  = 'chestmnist'
+        self.data_flag  = 'organsmnist'
         self.info       = INFO[self.data_flag]
         self.task       = self.info['task']        
         self.n_channels = self.info
@@ -518,6 +518,7 @@ class VisionData(DataBase):
     
     
     # ChestMNIST
+    '''
     @property
     def train_dataset(self):        
         values = self.DataClass(root='./data/MedMNIST2D/ChestMNIST',split='train',transform=self.train_transform, download=True,size=28)
@@ -532,7 +533,7 @@ class VisionData(DataBase):
     def test_dataset(self):
         values = self.DataClass(root='./data/MedMNIST2D/ChestMNIST',split='test',transform=self.val_transform, download=True,size=28)
         return values    
-
+    '''
 
     # DermaMNIST
     '''
@@ -607,7 +608,6 @@ class VisionData(DataBase):
     '''
     
     # OrganSMNIST
-    '''
     @property
     def train_dataset(self):        
         values = self.DataClass(root='./data/MedMNIST2D/OrganSMNIST',split='train',transform=self.train_transform, download=True, size=28)                
@@ -622,4 +622,3 @@ class VisionData(DataBase):
     def test_dataset(self):
         values = self.DataClass(root='./data/MedMNIST2D/OrganSMNIST',split='test',transform=self.val_transform, download=True, size=28)                
         return values            
-    '''

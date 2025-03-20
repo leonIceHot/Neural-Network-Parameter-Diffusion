@@ -21,7 +21,7 @@ class CFTask(BaseTask):
         self.train_loader = self.task_data.train_dataloader()
         self.eval_loader  = self.task_data.val_dataloader()
         self.test_loader  = self.task_data.test_dataloader()
-        self.dataset      = "pathmnist"
+        self.dataset      = "organsmnist"
         self.task         = "multi-class"
         #self.task         = "binary-class"
         self.writer       = SummaryWriter('runs/' + self.dataset)

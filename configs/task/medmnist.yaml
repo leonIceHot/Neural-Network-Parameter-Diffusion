@@ -9,7 +9,7 @@ data:
 # model for data
 model:
   _target_: models.resnet.ResNet18
-  num_classes: 14
+  num_classes: 11
   input_channel: 1
 
 # optimizer for training task model
@@ -54,3 +54,5 @@ param:
   data_root: param_data/medmnist/data.pt
   k: 200
   num_workers: 24
+
+
